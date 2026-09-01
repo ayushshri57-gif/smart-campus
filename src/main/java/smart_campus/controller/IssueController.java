@@ -15,6 +15,7 @@ import smart_campus.dto.IssueRequest;
 import smart_campus.dto.IssueResponse;
 import smart_campus.dto.IssueUpdateRequest;
 import smart_campus.entity.Issue;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/issues")
@@ -114,6 +115,7 @@ public List<IssueResponse> filterIssues(
 
     // DELETE
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteIssue(@PathVariable Long id) {
 
         issueService.deleteIssue(id);

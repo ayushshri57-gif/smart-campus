@@ -1,25 +1,23 @@
 package smart_campus.security;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
-
-import javax.crypto.SecretKey;
 
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+import javax.crypto.SecretKey;
+
 @Service
 public class JwtService {
 
-    private static final String SECRET =
-            "SmartCampusSecretKeyForJwtAuthentication2026VerySecure";
+    private final String SECRET_KEY =
+            "mySecretKeyForSmartCampusProject123456789";
 
-    private final SecretKey key =
-            Keys.hmacShaKeyFor(
-                    SECRET.getBytes(StandardCharsets.UTF_8)
-            );
+    private SecretKey getKey() {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
 
     public String generateToken(String username, String role) {
 
@@ -28,30 +26,42 @@ public class JwtService {
                 .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(
-                        new Date(
-                                System.currentTimeMillis()
-                                        + 1000 * 60 * 60
-                        )
+                        new Date(System.currentTimeMillis() + 1000 * 60 * 60)
                 )
-                .signWith(key)
+                .signWith(getKey())
                 .compact();
     }
 
     public String extractUsername(String token) {
 
         return Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(getKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
     }
 
-    public boolean isValid(String token) {
+    public String extractRole(String token) {
+
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
+    }
+
+    public boolean isTokenValid(String token) {
 
         try {
-            extractUsername(token);
+            Jwts.parser()
+                    .verifyWith(getKey())
+                    .build()
+                    .parseSignedClaims(token);
+
             return true;
+
         } catch (Exception e) {
             return false;
         }

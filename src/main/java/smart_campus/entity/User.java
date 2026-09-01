@@ -22,12 +22,14 @@ public class User {
     public User() {
     }
 
-    public Long getId() {
-        return id;
+    public User(String username, String password, String role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getId() {
+        return id;
     }
 
     public String getUsername() {
